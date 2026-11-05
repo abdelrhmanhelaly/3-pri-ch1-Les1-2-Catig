@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي التفاعلات الكيميائية والاحتراق - 3 إعدادي</title>
+    <!-- مكتبات التصدير والمؤثرات البصرية -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            /* النمط الداكن العصري (الافتراضي والأساسي) */
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+            --card-bg: #111827;
+            --text-main: #f9fafb;
+            --text-muted: #a5b4fc;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --option-bg: #1f2937;
+            --option-border: #374151;
+            --status-bg: #182234;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            --header-gradient: linear-gradient(90deg, #818cf8, #38bdf8);
+        }
+
+        body.theme-vibrant {
+            /* النمط الملون */
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f5f3ff 50%, #ecfdf5 100%);
+            --card-bg: rgba(255, 255, 255, 0.94);
+            --text-main: #1e1b4b;
+            --text-muted: #4338ca;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --option-bg: #f8faff;
+            --option-border: #c7d2fe;
+            --status-bg: #eef2ff;
+            --shadow: 0 15px 35px rgba(79, 70, 229, 0.15);
+            --header-gradient: linear-gradient(90deg, #4f46e5, #06b6d4);
+        }
+
+        body.theme-light {
+            /* النمط الأبيض */
+            --bg-gradient: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --option-bg: #ffffff;
+            --option-border: #e2e8f0;
+            --status-bg: #f1f5f9;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --header-gradient: linear-gradient(90deg, #2563eb, #3b82f6);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 760px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .theme-switcher {
+            display: flex;
+            gap: 6px;
+            background: var(--status-bg);
+            padding: 5px;
+            border-radius: 30px;
+            border: 1px solid var(--option-border);
+        }
+
+        .theme-btn {
+            border: none;
+            background: none;
+            font-size: 0.88rem;
+            padding: 5px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .theme-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px dashed var(--option-border);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+
+        header h1 {
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .designer-tag {
+            background: var(--status-bg);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            display: inline-block;
+            font-weight: bold;
+            border: 1px solid var(--option-border);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--status-bg);
+            padding: 10px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            font-weight: 800;
+            font-size: 0.92rem;
+            border: 1px solid var(--option-border);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .badge-score { color: #10b981; }
+        .badge-lives { color: #f87171; }
+        .badge-skips { color: #fbbf24; }
+        .badge-timer { color: #38bdf8; font-family: monospace; font-size: 1.05rem; }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            scrollbar-width: none;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+
+        .cat-btn {
+            white-space: nowrap;
+            background: var(--status-bg);
+            border: 1px solid var(--option-border);
+            padding: 9px 15px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .cat-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .cat-btn.summary-btn {
+            border: 1.8px solid #a855f7;
+            color: #c084fc;
+        }
+        .cat-btn.summary-btn.active {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+        }
+
+        /* شاشة البدء المخصصة للكاتيجوري */
+        .start-prompt-box {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--status-bg);
+            border: 2px dashed var(--primary);
+            border-radius: 18px;
+            margin-bottom: 20px;
+        }
+
+        .start-prompt-box h3 {
+            color: var(--text-main);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .start-prompt-box p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn-start-cat {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 13px 30px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-start-cat:hover {
+            background: var(--primary-hover);
+            transform: scale(1.03);
+        }
+
+        .question-box {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: var(--option-bg);
+            border: 2px solid var(--option-border);
+            color: var(--text-main);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: right;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            background: var(--status-bg);
+        }
+
+        .option-btn.correct {
+            background: #064e3b !important;
+            border-color: #10b981 !important;
+            color: #ecfdf5 !important;
+        }
+
+        .option-btn.wrong {
+            background: #7f1d1d !important;
+            border-color: #ef4444 !important;
+            color: #fef2f2 !important;
+            animation: shake 0.3s;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.92rem;
+            min-width: 100px;
+        }
+
+        .btn-pause { background: #1e3a8a; color: #bfdbfe; }
+        .btn-pause.paused { background: #065f46; color: #a7f3d0; }
+        .btn-skip { background: #78350f; color: #fde68a; }
+        .btn-end { background: #7f1d1d; color: #fecaca; }
+
+        /* ستايل شاشة التلخيص */
+        .summary-container {
+            display: none;
+            max-height: 620px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .summary-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            background: var(--status-bg);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--option-border);
+        }
+
+        .btn-back-main {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-subtabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+
+        .sub-btn {
+            background: var(--status-bg);
+            border: 1px solid var(--option-border);
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .sub-btn.active {
+            background: #8b5cf6;
+            color: #fff;
+            border-color: #8b5cf6;
+        }
+
+        .summary-item {
+            background: var(--status-bg);
+            border-right: 4px solid var(--primary);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-top: 1px solid var(--option-border);
+            border-left: 1px solid var(--option-border);
+            border-bottom: 1px solid var(--option-border);
+        }
+
+        .summary-item h4 {
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .summary-item p {
+            color: var(--text-main);
+            font-size: 0.94rem;
+            line-height: 1.6;
+        }
+
+        /* كروت المعادلات الكيميائية */
+        .equation-box {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.05rem;
+            direction: ltr;
+            text-align: left;
+            color: #38bdf8;
+            margin: 6px 0;
+            border: 1px dashed var(--option-border);
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* شاشة نهاية اللعبة */
+        .end-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .score-card {
+            background: var(--status-bg);
+            border: 2px solid var(--option-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 15px 0;
+            color: var(--text-main);
+        }
+
+        .score-card .final-score {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .share-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-share {
+            padding: 13px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-whatsapp { background: #25d366; }
+        .btn-facebook { background: #1877f2; }
+        .btn-image { background: #8b5cf6; }
+        .btn-restart { background: var(--primary); margin-top: 5px; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body class="theme-dark">
+
+    <div class="container">
+        <!-- شريط تغيير المظهر -->
+        <div class="top-bar">
+            <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-muted);">المظهر:</span>
+            <div class="theme-switcher">
+                <button class="theme-btn" id="btn-theme-vibrant" onclick="setTheme('vibrant')">ملون</button>
+                <button class="theme-btn" id="btn-theme-light" onclick="setTheme('light')">أبيض</button>
+                <button class="theme-btn active" id="btn-theme-dark" onclick="setTheme('dark')">داكن</button>
+            </div>
+        </div>
+
+        <!-- ترويسة اللعبة -->
+        <header>
+            <h1>⚗️ بنك أسئلة وتلخيص التفاعلات الكيميائية والاحتراق</h1>
+            <div class="designer-tag">
+                مصمم اللعبة: أ/ عبد الرحمن عبد الله - 01021779644
+            </div>
+        </header>
+
+        <!-- واجهة التلخيص والمراجعة الشاملة -->
+        <div id="summary-view" class="summary-container">
+            <div class="summary-header-bar">
+                <button class="btn-back-main" onclick="returnToGame()">🔙 العودة للعبة</button>
+                <span style="font-weight: bold; font-size: 0.95rem; color: var(--text-muted);">كراسة المراجعة السريعة (الوحدة الأولى)</span>
+            </div>
+            <div class="summary-subtabs">
+                <button class="sub-btn active" onclick="showSummaryTab('defs')">📖 جميع التعريفات</button>
+                <button class="sub-btn" onclick="showSummaryTab('reasons')">💡 جميع التعليلات</button>
+                <button class="sub-btn" onclick="showSummaryTab('experiments')">🔬 التجارب والأنشطة</button>
+                <button class="sub-btn" onclick="showSummaryTab('equations')">🧪 جميع المعادلات الكيميائية</button>
+                <button class="sub-btn" onclick="showSummaryTab('comps')">⚖️ المقارنات الهامة</button>
+                <button class="sub-btn" onclick="showSummaryTab('series')">⚡ متسلسلة النشاط ومثلث الاحتراق</button>
+            </div>
+            <div id="summary-content"></div>
+        </div>
+
+        <!-- واجهة الأسئلة -->
+        <div id="game-view">
+            <!-- شريط الأقسام -->
+            <div class="category-tabs" id="category-tabs"></div>
+
+            <!-- شاشة بدء التحدي لكل كاتيجوري -->
+            <div id="cat-start-screen" class="start-prompt-box">
+                <h3 id="cat-start-title">اسم الكاتيجوري</h3>
+                <p id="cat-start-info">معلومات الوقت والأسئلة...</p>
+                <button class="btn-start-cat" onclick="startCategoryQuiz()">▶️ بدء التحدي الآن</button>
+            </div>
+
+            <!-- محتوى الاختبار الفعلي -->
+            <div id="quiz-active-area" style="display: none;">
+                <!-- شريط الحالة (تم تعديل القلوب إلى 5 وإضافة التايمر) -->
+                <div class="status-bar">
+                    <span class="badge-score">🏆 النقاط: <span id="score-val">0</span></span>
+                    <span class="badge-lives">❤️ المحاولات: <span id="lives-val">5/5</span></span>
+                    <span class="badge-skips">⏩ التخطي: <span id="skips-val">3/3</span></span>
+                    <span class="badge-timer">⏳ الوقت المتبقي: <span id="timer-val">03:00</span></span>
+                </div>
+
+                <!-- كارت السؤال والخيارات -->
+                <div class="question-box" id="question-text">جارٍ تحميل السؤال...</div>
+                <div class="options-grid" id="options-container"></div>
+
+                <!-- أزرار التحكم -->
+                <div class="actions-bar">
+                    <button class="btn-action btn-pause" id="btn-pause" onclick="togglePauseGame()">⏸️ إيقاف مؤقت</button>
+                    <button class="btn-action btn-skip" id="btn-skip" onclick="skipQuestion()">⏩ تخطي السؤال</button>
+                    <button class="btn-action btn-end" onclick="endGame('manual')">🛑 إنهاء التحدي</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- شاشة النتيجة وشهادة التقدير -->
+        <div id="end-view" class="end-screen">
+            <div class="score-card" id="export-card">
+                <h2>شهادة إنجاز التحدي 🎓</h2>
+                <p style="color: var(--text-muted); margin-top: 5px;">الوحدة الأولى: التفاعلات الكيميائية والاحتراق - الصف الثالث الإعدادي</p>
+                <div class="final-score" id="final-score-val">0</div>
+                <p id="evaluation-text" style="font-weight: bold; font-size: 1.15rem; color: #10b981; line-height: 1.6;"></p>
+                <div style="margin-top: 15px; border-top: 1px dashed var(--option-border); padding-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
+                    إعداد الأستاذ: عبد الرحمن عبد الله | هاتف: 01021779644
+                </div>
+            </div>
+
+            <!-- خيارات المشاركة والحفظ -->
+            <div class="share-buttons">
+                <button class="btn-share btn-image" onclick="downloadResultImage()">📸 تحميل النتيجة كصورة للستوري</button>
+                <button class="btn-share btn-whatsapp" onclick="shareWhatsApp()">💬 إرسال النتيجة عبر واتساب</button>
+                <button class="btn-share btn-facebook" onclick="shareFacebook()">🌐 نسخ النتيجة للنشر على فيسبوك</button>
+                <button class="btn-share btn-restart" onclick="restartGame()">🔄 إعادة اللعب بأسئلة متجددة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // نظام المؤثرات الصوتية
+        let audioCtx;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'correct') {
+                    const notes = [659.25, 880];
+                    notes.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + i * 0.12);
+
+                        gain.gain.setValueAtTime(0, now + i * 0.12);
+                        gain.gain.linearRampToValueAtTime(0.18, now + i * 0.12 + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.35);
+
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+
+                        osc.start(now + i * 0.12);
+                        osc.stop(now + i * 0.12 + 0.35);
+                    });
+                } else if (type === 'wrong') {
+                    [160, 120].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.15);
+
+                        gain.gain.setValueAtTime(0.22, now + idx * 0.15);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.15 + 0.14);
+
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+
+                        osc.start(now + idx * 0.15);
+                        osc.stop(now + idx * 0.15 + 0.14);
+                    });
+                } else if (type === 'win') {
+                    const chord = [523.25, 659.25, 783.99, 1046.50];
+                    chord.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+
+                        gain.gain.setValueAtTime(0, now + idx * 0.1);
+                        gain.gain.linearRampToValueAtTime(0.15, now + idx * 0.1 + 0.03);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.45);
+
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.45);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio waiting for user click");
+            }
+        }
+
+        // قاعدة بيانات التلخيص والمراجعة الشاملة المدمجة
+        const summaryData = {
+            defs: [
+                { title: "التفاعل الكيميائي", desc: "عملية كسر الروابط في جزيئات المواد المتفاعلة وتكوين روابط جديدة في جزيئات المواد الناتجة." },
+                { title: "تفاعلات الاتحاد المباشر", desc: "تفاعلات تتحد فيها مادتان أو أكثر لتكوين مركب واحد جديد (A + B → AB)." },
+                { title: "تفاعلات الانحلال", desc: "تفاعلات تتفكك فيها بعض المركبات إلى مكونات أبسط باستخدام طاقة حرارية أو ضوئية." },
+                { title: "متسلسلة النشاط الكيميائي", desc: "ترتيب العناصر الفلزية تنازلياً حسب درجة نشاطها الكيميائي." },
+                { title: "تفاعلات الإحلال البسيط", desc: "تفاعلات كيميائية يحل فيها عنصر أنشط محل عنصر آخر أقل نشاطاً في محلول أحد مركباته." },
+                { title: "تفاعلات الإحلال المزدوج", desc: "تفاعلات يتم فيها تبادل كاتيونات وأنيونات مركبين أيونيين لتكوين مركبين جديدين." },
+                { title: "تفاعل التعادل", desc: "تفاعل حمض مع قلوي لتكوين ملح وماء." },
+                { title: "الأكسدة (مفهوم تقليدي)", desc: "عملية كيميائية تؤدي إلى زيادة نسبة الأكسجين في المادة أو نقص نسبة الهيدروجين فيها." },
+                { title: "الاختزال (مفهوم تقليدي)", desc: "عملية كيميائية تؤدي إلى نقص نسبة الأكسجين في المادة أو زيادة نسبة الهيدروجين فيها." },
+                { title: "الأكسدة (مفهوم إلكتروني حديث)", desc: "عملية كيميائية تفقد فيها الذرة أو الأيون إلكتروناً أو أكثر." },
+                { title: "الاختزال (مفهوم إلكتروني حديث)", desc: "عملية كيميائية تكتسب فيها الذرة أو الأيون إلكتروناً أو أكثر." },
+                { title: "العامل المؤكسد", desc: "المادة التي تمنح الأكسجين أو تنتزع الهيدروجين (تقليدياً)، أو المادة التي تكتسب إلكتروناً أو أكثر (إلكترونياً)." },
+                { title: "العامل المختزل", desc: "المادة التي تنتزع الأكسجين أو تمنح الهيدروجين (تقليدياً)، أو المادة التي تفقد إلكتروناً أو أكثر (إلكترونياً)." },
+                { title: "الاحتراق", desc: "تفاعل كيميائي بين مادة والأكسجين ينتج عنه طاقة حرارية أو ضوئية أو كلاهما ومواد جديدة تختلف باختلاف المادة المحترقة." },
+                { title: "درجة الاشتعال", desc: "أقل درجة حرارة يجب أن تصل إليها المادة لتبدأ في الاشتعال وتستمر في الاحتراق تلقائياً." },
+                { title: "قابلية الاشتعال", desc: "مدى سهولة وسرعة اشتعال المادة عند درجة حرارة الوسط المحيط بها." },
+                { title: "السناج", desc: "مسحوق أسود من دقائق الكربون غير المحترق ناتج عن الاحتراق غير التام للهيدروكربونات." },
+                { title: "السحابة السوداء", desc: "دخان كثيف يتشكل في الهواء الجوي نتيجة تصاعد كميات هائلة من الغازات الضارة وجسيمات الكربون المعلقة إثر حرق قش الأرز." },
+                { title: "عادم السيارة", desc: "خليط من الانبعاثات والغازات الضارة الناتجة عن احتراق الوقود داخل محرك السيارة." },
+                { title: "المحول الحفزي (علبة البيئة)", desc: "جهاز في السيارات يعتمد على عوامل حفازة لتحويل الغازات السامة المنبعثة من المحرك إلى مواد آمنة." },
+                { title: "الأمطار الحمضية", desc: "أمطار ناتجة عن ذوبان الغازات الحمضية (مثل أكاسيد الكبريت وأكاسيد النيتروجين) في ماء المطر." }
+            ],
+            reasons: [
+                { title: "علل: ظهور لون فضي عند تسخين أكسيد الزئبق الأحمر؟", desc: "لانحلاله بالحرارة إلى فلز الزئبق (فضي اللون) ويتصاعد غاز الأكسجين." },
+                { title: "علل: يحل الماغنسيوم والخارصين محل هيدروجين الحمض بينما لا يحل النحاس محله؟", desc: "لأن الماغنسيوم والخارصين يسبقان الهيدروجين في متسلسلة النشاط الكيميائي فيكونان أنشط منه، بينما النحاس يليه في المتسلسلة فهو أقل منه نشاطاً." },
+                { title: "علل: تأخر بدء تفاعل الألومنيوم مع حمض الهيدروكلوريك المخفف رغم أنه يسبق الخارصين؟", desc: "لوجود طبقة عازلة من أكسيد الألومنيوم (Al2O3) على سطحه تأخذ فترة من الوقت حتى تتآكل بفعل الحمض." },
+                { title: "علل: لا تطفأ حرائق الصوديوم بالماء؟", desc: "لأن تفاعل الصوديوم مع الماء عنيف ومصحوب بانطلاق حرارة هائلة تؤدي إلى اشتعال غاز الهيدروجين المتصاعد بفرقعة وحدوث انفجار." },
+                { title: "علل: يحل الخارصين محل النحاس في محاليل أملاحه؟", desc: "لأن الخارصين أكثر نشاطاً كيميائياً من النحاس ويسبقه في متسلسلة النشاط الكيميائي." },
+                { title: "علل: عدم حفظ محلول نترات الفضة في أوانٍ من الألومنيوم؟", desc: "لأن الألومنيوم يسبق الفضة في متسلسلة النشاط الكيميائي فيحل محلها، مما يؤدي إلى تآكل أواني الألومنيوم وتلفها." },
+                { title: "علل: تكون راسب أبيض عند تفاعل نترات الفضة مع كلوريد الصوديوم؟", desc: "لتكون ملح كلوريد الفضة (AgCl) وهو ملح شحيح الذوبان في الماء (راسب أبيض)." },
+                { title: "علل: الأكسدة والاختزال عمليتان متلازمتان تحدثان معاً في نفس الوقت؟", desc: "لأن عدد الإلكترونات المكتسبة في عملية الاختزال يساوي تماماً عدد الإلكترونات المفقودة في عملية الأكسدة." },
+                { title: "علل: معظم الفلزات عوامل مختزلة بينما اللافلزات عوامل مؤكسدة؟", desc: "لأن الفلزات تميل لفقد الإلكترونات أثناء التفاعل (تتأكسد)، بينما اللافلزات تميل لاكتساب الإلكترونات (تختزل)." },
+                { title: "علل: الورق الجاف يشتعل أسرع من الورق المبلل بالماء؟", desc: "لأن الماء يمتص جزءاً من الحرارة مما يؤخر وصول الورق المبلل إلى درجة الاشتعال الخاصة به." },
+                { title: "علل: تكون طبقة سوداء من السناج على الأواني عند احتراق الغاز بلهب أصفر؟", desc: "لحدوث احتراق غير تام ناتج عن نقص كمية الأكسجين الداخلة للموقد فيترسب الكربون غير المحترق." },
+                { title: "علل: يفضل الغاز الطبيعي عن الفحم الحجري كمصدر للطاقة في الصناعة؟", desc: "لأنه أقل تلويثاً للبيئة لانخفاض نسبة انبعاثات ثاني أكسيد الكربون والانخفاض الشديد لأكاسيد الكبريت ودقائق الكربون." },
+                { title: "علل: تركيب فلاتر وأجهزة غسل الغازات على مداخن المصانع؟", desc: "لتنقية الغازات ومعالجة الغازات الحمضية السامة وترسيبها كأملاح آمنة لمنع تكوّن الأمطار الحمضية." }
+            ],
+            experiments: [
+                { title: "تجربة انحلال أكسيد الزئبق بالحرارة", desc: "تسخين أكسيد الزئبق الأحمر في أنبوبة اختبار. الملاحظة: تكون سائل فضي في القاع وتصاعد غاز يزيد اشتعال وتوهج الشظية (غاز الأكسجين)." },
+                { title: "تجربة انحلال كربونات الكالسيوم", desc: "تسخين مسحوق كربونات الكالسيوم البيضاء وتمرير الغاز الناتج على ماء جير رائق. الملاحظة: يتعكر ماء الجير دلالة على تصاعد غاز ثاني أكسيد الكربون (CO2)." },
+                { title: "تجربة تفاعل الفلزات مع حمض الهيدروكلوريك", desc: "إضافة حمض HCl المخفف إلى قطع من (Mg, Zn, Fe, Cu). الملاحظة: فوران سريع مع Mg ثم Zn ثم Fe وتصاعد غاز يشتعل بفرقعة (H2)، بينما النحاس لا يتفاعل ولا ينتج غاز." },
+                { title: "تجربة تفاعل الصوديوم والماغنسيوم مع الماء", desc: "وضع صوديوم في ماء بارد يؤدي لفوران واشتعال أصفر برتقالي. أما الماغنسيوم فلا يتفاعل مع الماء البارد ويتفاعل ببطء مع الماء الساخن فقط." },
+                { title: "تجربة التعادل باستخدام دليل اليونيفرسال", desc: "إضافة HCl إلى هيدروكسيد صوديوم به دليل اليونيفرسال. الملاحظة: يتحول اللون البنفسجي (القلوي) تدريجياً حتى يصبح أخضر عند نقطة التعادل التام." },
+                { title: "تجربة موقد بنزن والاحتراق التام وغير التام", desc: "صمام الهواء مفتوح كلياً: وفرة أكسجين، لهب أزرق، احتراق تام وقاعدة الكأس نظيفة. صمام الهواء مغلق جزئياً: نقص أكسجين، لهب أصفر، احتراق غير تام وتكون سناج أسود." },
+                { title: "الكشف عن نواتج احتراق الغاز الطبيعي", desc: "تمرير نواتج الاحتراق: يعكر ماء الجير الرائق (وجود CO2)، ويتحول شريط كلوريد الكوبلت اللامائي من الأزرق الباهت إلى الوردي (وجود بخار الماء H2O)." }
+            ],
+            equations: [
+                { title: "احتراق الماغنسيوم في الأكسجين (اتحاد مباشر)", desc: "اتحاد الماغنسيوم بالأكسجين بالتسخين لإنتاج مسحوق أكسيد الماغنسيوم الأبيض.", eq: "2Mg + O2 --(Δ)--> 2MgO" },
+                { title: "انحلال أكسيد الزئبق الأحمر بالحرارة", desc: "تفكك أكسيد الزئبق الأحمر بالحرارة إلى زئبق فضي وغاز الأكسجين.", eq: "2HgO --(Δ)--> 2Hg + O2↑" },
+                { title: "انحلال كربونات الكالسيوم بالحرارة", desc: "تفكك كربونات الكالسيوم بالحرارة إلى أكسيد الكالسيوم وثاني أكسيد الكربون.", eq: "CaCO3 --(Δ)--> CaO + CO2↑" },
+                { title: "تفاعل الماغنسيوم مع حمض الهيدروكلوريك", desc: "إحلال الماغنسيوم محل هيدروجين الحمض وتصاعد غاز الهيدروجين وتكون كلوريد الماغنسيوم.", eq: "Mg + 2HCl (dil) --> MgCl2 + H2↑" },
+                { title: "تفاعل الخارصين مع حمض الهيدروكلوريك", desc: "إحلال الخارصين محل هيدروجين الحمض مع تصاعد غاز الهيدروجين الذي يشتعل بفرقعة.", eq: "Zn + 2HCl (dil) --> ZnCl2 + H2↑" },
+                { title: "تفاعل الحديد مع حمض الهيدروكلوريك", desc: "إحلال الحديد محل هيدروجين الحمض لإنتاج كلوريد حديد (II) وغاز الهيدروجين.", eq: "Fe + 2HCl (dil) --> FeCl2 + H2↑" },
+                { title: "تفاعل فلز الصوديوم مع الماء", desc: "إحلال الصوديوم محل هيدروجين الماء بعنف مكوناً محلول قلوي وتصاعد الهيدروجين مع انطلاق حرارة.", eq: "2Na + 2H2O --> 2NaOH + H2↑ + Heat" },
+                { title: "تفاعل الخارصين مع كبريتات النحاس (إحلال بسيط)", desc: "إحلال الخارصين محل النحاس وترسيب النحاس الأحمر وزوال اللون الأزرق.", eq: "Zn + CuSO4 --> ZnSO4 + Cu↓ (أحمر)" },
+                { title: "تفاعل التعادل (حمض مع قلوي)", desc: "تفاعل هيدروكسيد الصوديوم مع حمض الهيدروكلوريك لإنتاج ملح طعام متعادل وماء.", eq: "NaOH + HCl --> NaCl + H2O" },
+                { title: "تفاعل حمض مع ملح (كربونات الصوديوم و HCl)", desc: "تفاعل ينتج كلوريد الصوديوم وماء وثاني أكسيد الكربون الذي يعكر ماء الجير.", eq: "Na2CO3 + 2HCl --> 2NaCl + H2O + CO2↑" },
+                { title: "تفاعل الترسيب (نترات الفضة وكلوريد الصوديوم)", desc: "تبادل مزدوج يؤدي إلى تكوين راسب أبيض من كلوريد الفضة يتحول لبنفسجي بالضوء.", eq: "NaCl + AgNO3 --> NaNO3 + AgCl↓ (أبيض)" },
+                { title: "الأكسدة والاختزال بالمفهوم التقليدي (الهيدروجين وأكسيد النحاس)", desc: "تأكسد الهيدروجين إلى ماء واختزال أكسيد النحاس الأسود إلى نحاس أحمر.", eq: "H2 + CuO --(Δ)--> H2O + Cu" },
+                { title: "الاحتراق التام لغاز الميثان في وفرة من الأكسجين (1 : 2)", desc: "احتراق تام للميثان ينتج عنه ثاني أكسيد الكربون وبخار ماء وطاقة حرارية كبيرة.", eq: "CH4 + 2O2 --(Δ)--> CO2 + 2H2O + Heat" },
+                { title: "الاحتراق غير التام لغاز الميثان بنسبة (2 : 3)", desc: "احتراق غير تام ينتج عنه غاز أول أكسيد الكربون السام وبخار ماء وحرارة محدودة.", eq: "2CH4 + 3O2 --(Δ)--> 2CO + 4H2O + Heat" },
+                { title: "الاحتراق غير التام لغاز الميثان بنسبة (1 : 1)", desc: "احتراق غير تام ينتج عنه كربون صلب (سناج) وبخار ماء وحرارة محدودة.", eq: "CH4 + O2 --(Δ)--> C (سناج) + 2H2O + Heat" }
+            ],
+            comps: [
+                { title: "الإحلال البسيط vs الإحلال المزدوج", desc: "الإحلال البسيط: يحل عنصر نشط محل عنصر أقل نشاطاً في محلول أحد مركباته (A + BC → AC + B). الإحلال المزدوج: تبادل شقين أيونيين بين مركبين لتكوين مركبين جديدين (AB + CD → AD + CB)." },
+                { title: "الأكسدة vs الاختزال (المفهوم الإلكتروني)", desc: "الأكسدة: فقد إلكترونات وزيادة الشحنة الموجبة. الاختزال: اكتساب إلكترونات ونقص الشحنة الموجبة." },
+                { title: "العامل المؤكسد vs العامل المختزل", desc: "العامل المؤكسد: مادة تكتسب إلكترونات وتحدث لها عملية اختزال. العامل المختزل: مادة تفقد إلكترونات وتحدث لها عملية أكسدة." },
+                { title: "الاحتراق التام vs الاحتراق غير التام للغازات", desc: "التام: أكسجين وفير، لهب أزرق، نواتجه CO2 و H2O، طاقة حرارية عالية. غير التام: أكسجين محدود، لهب أصفر، نواتجه غاز CO السام و/أو السناج (C)، طاقة منخفضة." },
+                { title: "الأكاسيد القاعدية vs الأكاسيد الحامضية", desc: "الأكاسيد القاعدية: أكاسيد فلزية يذوب بعضها في الماء مكوناً قلويات تزرق صبغة عباد الشمس. الأكاسيد الحامضية: أكاسيد لافلزية تذوب في الماء مكونة أحماضاً تحمر صبغة عباد الشمس." }
+            ],
+            series: [
+                { title: "ترتيب متسلسلة النشاط الكيميائي من الأنبل إلى الأنشط", desc: "<strong>(K > Na > Li > Ba > Ca > Mg > Al > Zn > Fe > Sn > Pb > [H] > Cu > Hg > Ag > Pt > Au)</strong><br>العناصر التي تسبق الهيدروجين تحل محله في الأحماض والماء، وتتدرج سرعتها من العنيف جداً كالـ Na إلى البطيء كالحديد. العناصر التي تلي الهيدروجين لا تتفاعل مع الأحماض المخففة." },
+                { title: "أضلاع مثلث الاحتراق (مثلث النار)", desc: "<strong>1. الوقود</strong> (المادة القابلة للاشتعال)<br><strong>2. الأكسجين</strong> (الغاز المساعد على الاشتعال)<br><strong>3. مصدر الحرارة</strong> (لبلوغ درجة الاشتعال). غياب أي عنصر من الثلاثة يؤدي لانطفاء الحريق فوراً." }
+            ]
+        };
+
+        // بنك الأسئلة الشامل
+        const rawQuestionBank = {
+            "المفاهيم والنظريات": [
+                { q: "كسر الروابط في جزيئات المواد المتفاعلة وتكوين روابط جديدة في جزيئات المواد الناتجة يُعرف بـ:", correctText: "التفاعل الكيميائي", wrongOptions: ["متسلسلة النشاط الكيميائي", "العامل المؤكسد", "قابلية الاشتعال"] },
+                { q: "تفاعلات تتحد فيها مادتان أو أكثر لتكوين مركب واحد جديد هي تفاعلات:", correctText: "الاتحاد المباشر", wrongOptions: ["الانحلال الحراري", "الإحلال البسيط", "الإحلال المزدوج"] },
+                { q: "تفاعلات تتفكك فيها بعض المركبات إلى مكونات أبسط باستخدام الحرارة أو الضوء تُسمى:", correctText: "تفاعلات الانحلال", wrongOptions: ["تفاعلات الترسيب", "تفاعلات التعادل", "تفاعلات الأكسدة"] },
+                { q: "ترتيب العناصر الفلزية تنازلياً حسب درجة نشاطها الكيميائي يُعرف بـ:", correctText: "متسلسلة النشاط الكيميائي", wrongOptions: ["مثلث الاحتراق", "التكافؤ الكيميائي", "التوزيع الإلكتروني"] },
+                { q: "أي من الفلزات الآتية يسبق الهيدروجين في متسلسلة النشاط الكيميائي؟", correctText: "الخارصين (Zn)", wrongOptions: ["النحاس (Cu)", "الفضة (Ag)", "الذهب (Au)"] },
+                { q: "الفلز الذي يلي الهيدروجين مباشرة في متسلسلة النشاط الكيميائي الواردة بالملف هو:", correctText: "النحاس", wrongOptions: ["البلاتين", "الزئبق", "الرصاص"] },
+                { q: "تفاعلات يتم فيها تبادل كاتيونات وأنيونات مركبين أيونيين لتكوين مركبين جديدين هي تفاعلات:", correctText: "الإحلال المزدوج", wrongOptions: ["الاتحاد المباشر", "الإحلال البسيط", "الاحتراق"] },
+                { q: "تفاعل حمض مع قلوي لتكوين ملح وماء يُعرف باسم:", correctText: "تفاعل التعادل", wrongOptions: ["تفاعل الترسيب", "تفاعل الانحلال", "تفاعل التأكسد"] },
+                { q: "العملية الكيميائية التي تؤدي إلى زيادة نسبة الأكسجين أو نقص نسبة الهيدروجين في المادة هي:", correctText: "الأكسدة بالمفهوم التقليدي", wrongOptions: ["الاختزال", "التعادل", "الترسيب"] },
+                { q: "حسب المفهوم الإلكتروني الحديث، تُعرف الأكسدة بأنها عملية:", correctText: "فقد إلكترون أو أكثر", wrongOptions: ["اكتساب إلكترونات", "اتحاد مع الهيدروجين", "انحلال حراري"] },
+                { q: "المادة التي تكتسب إلكتروناً أو أكثر أثناء التفاعل الكيميائي تُسمى:", correctText: "العامل المؤكسد", wrongOptions: ["العامل المختزل", "العامل الحفاز", "الأنيون"] },
+                { q: "أقل درجة حرارة يجب أن تصل إليها المادة لتبدأ في الاشتعال وتستمر في الاحتراق تلقائياً هي:", correctText: "درجة الاشتعال", wrongOptions: ["درجة الغليان", "درجة الانصهار", "قابلية الاشتعال"] },
+                { q: "مواد عضوية تتكون من عنصري الكربون والهيدروجين فقط تُعرف بـ:", correctText: "الهيدروكربونات", wrongOptions: ["الأكاسيد الحامضية", "الأكاسيد القاعدية", "الأملاح الأيونية"] },
+                { q: "المكون الأساسي للغاز الطبيعي هو غاز:", correctText: "الميثان", wrongOptions: ["البيوتان", "البروبان", "الإيثيلين"] },
+                { q: "أكاسيد لافلزية تذوب في الماء مكونة محاليل حمضية تُسمى:", correctText: "الأكاسيد الحامضية", wrongOptions: ["الأكاسيد القاعدية", "الأكاسيد المترددة", "الأكاسيد الفلزية"] },
+                { q: "الكتلة الكلية لنواتج تفاعل الاحتراق تساوي الكتلة الكلية للمتفاعلات طبقاً لقانون:", correctText: "بقاء المادة", wrongOptions: ["النسب الثابتة", "النشاط الكيميائي", "بقاء الطاقة"] }
+            ],
+
+            "التجارب والأنشطة": [
+                { q: "عند تسخين أكسيد الزئبق الأحمر يتكون سائل فضي اللون من:", correctText: "الزئبق", wrongOptions: ["الفضة", "الألومنيوم", "الرصاص"] },
+                { q: "الغاز الناتج من انحلال كربونات الكالسيوم بالحرارة والذي يعكر ماء الجير الرائق هو:", correctText: "ثاني أكسيد الكربون", wrongOptions: ["الأكسجين", "الهيدروجين", "ثاني أكسيد الكبريت"] },
+                { q: "عند تفاعل الماغنسيوم مع حمض الهيدروكلوريك المخفف يتصاعد غاز:", correctText: "يشتعل بفرقعة (الهيدروجين)", wrongOptions: ["يعكر ماء الجير", "يزيد من توهج الشظية", "ذو رائحة نفاذة"] },
+                { q: "أي من الفلزات الآتية لا يُحدث تفاعلاً ولا يُصاعد فقاعات عند وضعه في حمض الهيدروكلوريك المخفف؟", correctText: "النحاس", wrongOptions: ["الخارصين", "الماغنسيوم", "الحديد"] },
+                { q: "عند وضع قطعة من فلز الصوديوم في الماء يتصاعد لهب لونه:", correctText: "أصفر برتقالي", wrongOptions: ["أزرق باهت", "أخضر", "بنفسجي"] },
+                { q: "الفلز الذي يتفاعل ببطء مع الماء الساخن فقط ولا يتفاعل مع الماء البارد هو:", correctText: "الماغنسيوم", wrongOptions: ["الصوديوم", "البوتاسيوم", "الكالسيوم"] },
+                { q: "عند غمر ساق من الخارصين في محلول كبريتات النحاس الزرقاء:", correctText: "يزول لون المحلول الأزرق وتترسب طبقة حمراء", wrongOptions: ["يتحول المحلول إلى اللون الأحمر", "يتصاعد غاز الهيدروجين", "لا يحدث تفاعل"] },
+                { q: "يتلون دليل اليونيفرسال في المحلول المتعادل عند نقطة التعادل باللون:", correctText: "الأخضر", wrongOptions: ["البنفسجي", "الأحمر", "الأصفر"] },
+                { q: "عند إضافة محلول نترات الفضة إلى محلول كلوريد الصوديوم يتكون راسب أبيض يتحول بالضوء إلى اللون:", correctText: "البنفسجي", wrongOptions: ["الأسود", "الأزرق", "الأصفر"] },
+                { q: "المحلول المائي الناتج من ذوبان مسحوق أكسيد الماغنسيوم في الماء يحول صبغة دوار الشمس إلى اللون:", correctText: "الأزرق", wrongOptions: ["الأحمر", "الأصفر", "البرتقالي"] },
+                { q: "عند حرق الكربون في مخبار مملوء بالأكسجين ثم إضافة ماء ودوار شمس، يتلون المحلول باللون:", correctText: "الأحمر", wrongOptions: ["الأزرق", "الأخضر", "البنفسجي"] },
+                { q: "عندما يكون صمام الهواء في موقد بنزن مفتوحاً كلياً، يظهر اللهب باللون:", correctText: "الأزرق", wrongOptions: ["الأصفر", "البرتقالي", "الأحمر"] },
+                { q: "يُستدل على وجود بخار الماء بين نواتج احتراق الغاز الطبيعي باستخدام شريط كلوريد الكوبلت اللامائي الذي يتحول لونه من الأزرق الباهت إلى:", correctText: "الوردي", wrongOptions: ["الأخضر", "الأسود", "الأصفر"] },
+                { q: "عند غلق صمام الهواء لموقد بنزن جزئياً يتكون على قاعدة الكأس مسحوق أسود يُعرف بـ:", correctText: "السناج (الكربون غير المحترق)", wrongOptions: ["أكسيد النحاس", "كبريتيد الفضة", "الفحم الحجري"] }
+            ],
+
+            "التطبيقات التكنولوجية": [
+                { q: "الطبقة السوداء التي تفقد الفضة بريقها ولمعانها بمرور الزمن تتكون من مركب:", correctText: "كبريتيد الفضة", wrongOptions: ["أكسيد الفضة", "نترات الفضة", "كلوريد الفضة"] },
+                { q: "يتم تنظيف الفضة منزلياً بوضعها في إناء مبطن بورق الألومنيوم وماء مغلي ومضاف إليه:", correctText: "بيكربونات الصوديوم", wrongOptions: ["ملح طعام", "حمض هيدروكلوريك", "سكر"] },
+                { q: "المياه التي تحتوي على نسب عالية من أملاح الكالسيوم والماغنسيوم تُسمى:", correctText: "الماء العسر", wrongOptions: ["الماء النقي", "الماء المقطر", "الماء القلوي"] },
+                { q: "تُضاف مادة ......... في محطات المياه لمعالجة الماء العسر عن طريق تفاعلات الترسيب:", correctText: "كربونات الصوديوم", wrongOptions: ["كبريتات النحاس", "نترات الفضة", "هيدروكسيد البوتاسيوم"] },
+                { q: "يحتوي سطح الاحتكاك على جانبي علبة أعواد الثقاب على مادة:", correctText: "الفوسفور الأحمر", wrongOptions: ["كلورات البوتاسيوم", "كبريتيد الأنتيمون", "الفوسفور الأبيض"] },
+                { q: "المادة التي تعمل كعامل مؤكسد في رأس عود الثقاب هي:", correctText: "كلورات البوتاسيوم (KClO3)", wrongOptions: ["كبريتيد الأنتيمون", "مسحوق الزجاج", "الفوسفور الأحمر"] },
+                { q: "تُساعد صيانة محركات السيارات وضبط فتحات اللهب في موقد الغاز على:", correctText: "حدوث احتراق تام وتوفير استهلاك الوقود", wrongOptions: ["تحويل الاحتراق التام إلى غير تام", "تكوين طبقة السناج", "تقليل كمية الأكسجين المتفاعلة"] },
+                { q: "الجهاز المركب في نظام عادم السيارات لتحويل الغازات الضارة إلى غازات آمنة يُعرف بـ:", correctText: "المحول الحفزي (علبة البيئة)", wrongOptions: ["جهاز غسل الغازات", "المولد الكهربي", "موقد بنزن"] },
+                { q: "في المحول الحفزي، يتحول غاز أول أكسيد الكربون (CO) السام إلى:", correctText: "غاز ثاني أكسيد الكربون (CO2)", wrongOptions: ["غاز الميثان", "بخار ماء", "كربون صلب"] },
+                { q: "تعتمد أجهزة غسل الغازات الحمضية في مداخن المصانع على إجراء تفاعلات:", correctText: "تعادل بين الغازات الحمضية ومحاليل قلوية", wrongOptions: ["أكسدة واختزال", "إحلال بسيط", "انحلال حراري"] }
+            ],
+
+            "تدريبات ومسائل المنهج": [
+                { q: "في المعادلة: Fe + CuSO4 → FeSO4 + Cu يُعد التفاعل من تفاعلات:", correctText: "الإحلال البسيط", wrongOptions: ["الانحلال الحراري", "الإحلال المزدوج", "الاتحاد المباشر"] },
+                { q: "عند حرق شريط الماغنسيوم في وفرة من الأكسجين فإن المادة الناتجة تكون ذات حالة فيزيائية ولون:", correctText: "صلب أبيض اللون", wrongOptions: ["سائل فضي", "غاز عديم اللون", "صلب أسود اللون"] },
+                { q: "في التفاعل: 2Na + Cl2 → 2NaCl، يُعتبر غاز الكلور:", correctText: "عاملاً مؤكسداً", wrongOptions: ["عاملاً مختزلاً", "مادة متفرجة", "راسباً"] },
+                { q: "أي المعادلات النصفية الآتية تمثل نصف تفاعل أكسدة فقط؟", correctText: "Mg → Mg2+ + 2e-", wrongOptions: ["Cu2+ + 2e- → Cu", "Cl2 + 2e- → 2Cl-", "Ag+ + e- → Ag"] },
+                { q: "النسبة الجزيئية بين غاز الميثان وغاز الأكسجين لحدوث احتراق تام ينتج عنه CO2 و H2O هي:", correctText: "1 : 2", wrongOptions: ["1 : 1", "2 : 3", "2 : 1"] },
+                { q: "لا يمكن حفظ محلول نترات الفضة في أوانٍ مصنوعة من الألومنيوم لأن:", correctText: "الألومنيوم يسبق الفضة ويحل محلها مما يؤدي لتآكل الأواني", wrongOptions: ["الفضة تسبق الألومنيوم في المتسلسلة", "الألومنيوم لا يتفاعل مع الأملاح", "الفضة تتأكسد وتكون صدأ"] },
+                { q: "عدد جزيئات الأكسجين اللازمة لحرق 2 جزيء من غاز الميثان احتراقاً تاماً يساوي:", correctText: "4 جزيئات", wrongOptions: ["2 جزيء", "3 جزيئات", "6 جزيئات"] },
+                { q: "عند ذوبان غاز ثاني أكسيد الكبريت (SO2) في الماء يتكون حمض:", correctText: "الكبريتوز (H2SO3)", wrongOptions: ["الكبريتيك", "الهيدروكلوريك", "النيتريك"] },
+                { q: "تتحول قطعة الألومنيوم عند وضعها في محلول نترات الفضة إلى حالة تآكل، بينما يتكون راسب:", correctText: "من الفضة في قاع الأنبوبة", wrongOptions: ["أبيض من كلوريد الفضة", "أحمر من النحاس", "أصفر من الكبريت"] },
+                { q: "الغاز الذي يذوب في الماء مكوناً حمض النيتروز وحمض النيتريك ولونه بني محمر هو:", correctText: "ثاني أكسيد النيتروجين (NO2)", wrongOptions: ["أول أكسيد الكربون", "ثاني أكسيد الكبريت", "أكسيد النيتريك"] }
+            ],
+
+            "السلامة والوعي البيئي": [
+                { q: "يجب ارتداء نظارة واقية وتجنب إطالة النظر المباشر عند حرق شريط الماغنسيوم بسبب:", correctText: "انبعاث ضوء عالي الشدة وأشعة فوق بنفسجية تؤذي شبكية العين", wrongOptions: ["تصاعد غازات سامة", "حدوث فرقعة قوية", "تطاير شظايا ساخنة"] },
+                { q: "يُحفظ فلز الصوديوم في المعمل تحت سطح:", correctText: "الكيروسين لمنع تفاعله مع الهواء الرطب", wrongOptions: ["الماء", "الكحول", "حمض الهيدروكلوريك"] },
+                { q: "لا تُطفأ حرائق فلز الصوديوم باستخدام الماء لأن التفاعل:", correctText: "تنطلق منه كمية كبيرة من الحرارة تسبب اشتعال الهيدروجين أو حدوث انفجار", wrongOptions: ["ينتج مادة تزيد الاشتعال وهي غاز الأكسجين", "يُبرد الصوديوم ببطء", "يحول الصوديوم إلى بخار سام"] },
+                { q: "يتم وضع دلاء مملوءة بـ ......... في معامل المدارس لإخماد حرائق الصوديوم والفلزات النشطة:", correctText: "الرمل الجاف", wrongOptions: ["كربونات الكالسيوم", "الماء المثلج", "الكيروسين"] },
+                { q: "العلامة التحذيرية التي توضع على صهاريج نقل البنزين والكحول تشير إلى أنها مواد:", correctText: "ملتهبة سريعة الاشتعال", wrongOptions: ["مشعة", "أكالة وحامضية", "سامة باللمس"] },
+                { q: "الغاز السام عديم اللون والرائحة الناتج عن الاحتراق غير التام ويشكل خطورة شديدة على التنفس هو:", correctText: "غاز أول أكسيد الكربون (CO)", wrongOptions: ["ثاني أكسيد الكربون", "النيتروجين", "بخار الماء"] },
+                { q: "تنشأ ظاهرة 'السحابة السوداء' في سماء مصر في موسمي أكتوبر ونوفمبر بسبب:", correctText: "الحرق المكشوف للمخلفات الزراعية مثل قش الأرز", wrongOptions: ["احتراق الوقود في المصانع فقط", "عوادم قطارات السكة الحديد", "تبخر مياه النيل"] },
+                { q: "يحدث الاحتراق غير التام لأكوام قش الأرز في الحقول غالباً بسبب:", correctText: "تكدس الأكوام مما يمنع وصول كميات كافية من الأكسجين", wrongOptions: ["ارتفاع درجة حرارة الجو", "رطوبة الأرض الزراعية العالية", "احتوائه على كبريت خام"] },
+                { q: "الأمطار الناتجة عن ذوبان الغازات الحمضية مثل أكاسيد الكبريت والنيتروجين في ماء المطر تُعرف بـ:", correctText: "الأمطار الحمضية", wrongOptions: ["السحابة السوداء", "الضباب الدخاني", "الندى الحمضي"] },
+                { q: "يُفضل الاعتماد على الغاز الطبيعي بدلاً من الفحم الحجري في الصناعة ومحطات الكهرباء لأن:", correctText: "احتراق الغاز الطبيعي ينتج انبعاثات أقل بكثير من CO2 وأكاسيد الكبريت", wrongOptions: ["الغاز الطبيعي ينتج سناجاً أكثر", "الفحم طاقة متجددة", "الغاز الطبيعي لا يتطلب وجود أكسجين"] }
+            ]
+        };
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // متغيرات التحكم الأساسية في اللعبة
+        let currentCategory = "المفاهيم والنظريات";
+        let activeQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let lives = 5; // تم زيادة عدد القلوب إلى 5
+        let skips = 3;
+        let isAnsweringBlocked = false;
+
+        // متغيرات التايمر والإيقاف المؤقت
+        let timerInterval = null;
+        let timeRemaining = 180; // بالثواني
+        let isPaused = false;
+
+        function setTheme(theme) {
+            document.body.className = `theme-${theme}`;
+            document.querySelectorAll(".theme-btn").forEach(btn => btn.classList.remove("active"));
+            const targetBtn = document.getElementById(`btn-theme-${theme}`);
+            if (targetBtn) targetBtn.classList.add("active");
+        }
+
+        function initCategoryTabs() {
+            const tabsContainer = document.getElementById("category-tabs");
+            tabsContainer.innerHTML = "";
+
+            const summaryBtn = document.createElement("button");
+            summaryBtn.className = `cat-btn summary-btn ${currentCategory === 'summary' ? 'active' : ''}`;
+            summaryBtn.innerText = "📚 بنك التلخيص والمفاهيم";
+            summaryBtn.onclick = () => openSummaryView();
+            tabsContainer.appendChild(summaryBtn);
+
+            Object.keys(rawQuestionBank).forEach(cat => {
+                const btn = document.createElement("button");
+                btn.className = `cat-btn ${cat === currentCategory ? 'active' : ''}`;
+                btn.innerText = cat;
+                btn.onclick = () => selectCategory(cat);
+                tabsContainer.appendChild(btn);
+            });
+        }
+
+        function openSummaryView() {
+            stopTimer();
+            currentCategory = "summary";
+            document.getElementById("game-view").style.display = "none";
+            document.getElementById("end-view").style.display = "none";
+            document.getElementById("summary-view").style.display = "block";
+            initCategoryTabs();
+            showSummaryTab('defs');
+        }
+
+        function returnToGame() {
+            document.getElementById("summary-view").style.display = "none";
+            document.getElementById("game-view").style.display = "block";
+            selectCategory("المفاهيم والنظريات");
+        }
+
+        function showSummaryTab(tabKey) {
+            document.querySelectorAll(".sub-btn").forEach(b => b.classList.remove("active"));
+            if (event && event.target) {
+                event.target.classList.add("active");
+            }
+
+            const contentDiv = document.getElementById("summary-content");
+            contentDiv.innerHTML = "";
+
+            const items = summaryData[tabKey] || [];
+            items.forEach(item => {
+                const box = document.createElement("div");
+                box.className = "summary-item";
+                let extraHtml = "";
+                if (item.eq) {
+                    extraHtml = `<div class="equation-box">${item.eq}</div>`;
+                }
+                box.innerHTML = `<h4>${item.title}</h4>${extraHtml}<p>${item.desc}</p>`;
+                contentDiv.appendChild(box);
+            });
+        }
+
+        // اختيار الكاتيجوري وإظهار شاشة البدء المخصصة له
+        function selectCategory(cat) {
+            if (isAnsweringBlocked) return;
+            stopTimer();
+            currentCategory = cat;
+            document.getElementById("summary-view").style.display = "none";
+            document.getElementById("end-view").style.display = "none";
+            document.getElementById("game-view").style.display = "block";
+
+            initCategoryTabs();
+
+            // تجهيز شاشة البداية للكاتيجوري
+            const qCount = rawQuestionBank[cat].length;
+            // حساب الوقت: الكاتيجوري الأول (16 سؤال) = 180 ثانية (3 دقائق)، وباقي الأقسام تتناسب طردياً مع عدد الأسئلة
+            let calculatedSeconds = Math.round((qCount / 16) * 180);
+            if (calculatedSeconds < 60) calculatedSeconds = 60; // حد أدنى دقيقة
+
+            const mins = Math.floor(calculatedSeconds / 60);
+            const secs = calculatedSeconds % 60;
+            const timeFormatted = `${mins} دقيقة ${secs > 0 ? `و ${secs} ثانية` : ''}`;
+
+            document.getElementById("cat-start-title").innerText = `قسم: ${cat}`;
+            document.getElementById("cat-start-info").innerHTML = `عدد الأسئلة: <strong>${qCount} سؤالاً</strong> | الوقت المحدد: <strong>${timeFormatted}</strong><br>لديك <strong>5 قلوب</strong> للمحاولة. هل أنت مستعد لخوض التحدي؟`;
+
+            document.getElementById("cat-start-screen").style.display = "block";
+            document.getElementById("quiz-active-area").style.display = "none";
+        }
+
+        // بدء الاختبار الفعلي للكاتيجوري عند الضغط على زر البدء
+        function startCategoryQuiz() {
+            document.getElementById("cat-start-screen").style.display = "none";
+            document.getElementById("quiz-active-area").style.display = "block";
+
+            activeQuestions = shuffleArray(rawQuestionBank[currentCategory]);
+            currentQuestionIndex = 0;
+            isPaused = false;
+            updatePauseButtonUI();
+
+            // ضبط التايمر
+            const qCount = activeQuestions.length;
+            timeRemaining = Math.max(60, Math.round((qCount / 16) * 180));
+            updateTimerDisplay();
+            startTimer();
+
+            loadQuestion();
+        }
+
+        // تشغيل وإدارة التايمر
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        endGame('timeout');
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeRemaining / 60);
+            const s = timeRemaining % 60;
+            document.getElementById("timer-val").innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // نظام الإيقاف المؤقت والاستئناف
+        function togglePauseGame() {
+            isPaused = !isPaused;
+            updatePauseButtonUI();
+
+            const optionsContainer = document.getElementById("options-container");
+            const skipBtn = document.getElementById("btn-skip");
+
+            if (isPaused) {
+                optionsContainer.style.opacity = "0.3";
+                optionsContainer.style.pointerEvents = "none";
+                skipBtn.disabled = true;
+                skipBtn.style.opacity = "0.5";
+            } else {
+                optionsContainer.style.opacity = "1";
+                optionsContainer.style.pointerEvents = "auto";
+                skipBtn.disabled = false;
+                skipBtn.style.opacity = "1";
+            }
+        }
+
+        function updatePauseButtonUI() {
+            const pauseBtn = document.getElementById("btn-pause");
+            if (isPaused) {
+                pauseBtn.innerText = "▶️ استئناف التحدي";
+                pauseBtn.classList.add("paused");
+            } else {
+                pauseBtn.innerText = "⏸️ إيقاف مؤقت";
+                pauseBtn.classList.remove("paused");
+            }
+        }
+
+        function loadQuestion() {
+            isAnsweringBlocked = false;
+
+            if (currentQuestionIndex >= activeQuestions.length) {
+                activeQuestions = shuffleArray(rawQuestionBank[currentCategory]);
+                currentQuestionIndex = 0;
+            }
+
+            const rawQ = activeQuestions[currentQuestionIndex];
+            document.getElementById("question-text").innerText = rawQ.q;
+
+            const allOptions = shuffleArray([rawQ.correctText, ...rawQ.wrongOptions]);
+            const correctIndex = allOptions.indexOf(rawQ.correctText);
+
+            rawQ.currentShuffledOptions = allOptions;
+            rawQ.currentCorrectIndex = correctIndex;
+
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+
+            allOptions.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(idx, btn, correctIndex);
+                optionsContainer.appendChild(btn);
+            });
+
+            updateStatusBar();
+        }
+
+        function checkAnswer(selectedIdx, btnElement, correctIndex) {
+            if (isAnsweringBlocked || isPaused) return;
+            isAnsweringBlocked = true;
+
+            const allOptionButtons = document.querySelectorAll(".option-btn");
+
+            if (selectedIdx === correctIndex) {
+                btnElement.classList.add("correct");
+                score += 10;
+                playSound('correct');
+                confetti({ particleCount: 35, spread: 55, origin: { y: 0.8 } });
+            } else {
+                btnElement.classList.add("wrong");
+                allOptionButtons[correctIndex].classList.add("correct");
+                lives--;
+                playSound('wrong');
+            }
+
+            updateStatusBar();
+
+            setTimeout(() => {
+                if (lives <= 0) {
+                    endGame('lives');
+                } else {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }
+            }, 1200);
+        }
+
+        function skipQuestion() {
+            if (isAnsweringBlocked || skips <= 0 || isPaused) return;
+            skips--;
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function updateStatusBar() {
+            document.getElementById("score-val").innerText = score;
+            document.getElementById("lives-val").innerText = `${lives}/5`; // تم التحديث إلى 5
+            document.getElementById("skips-val").innerText = `${skips}/3`;
+
+            const skipBtn = document.getElementById("btn-skip");
+            if (skips <= 0) {
+                skipBtn.style.opacity = "0.5";
+                skipBtn.style.cursor = "not-allowed";
+            } else {
+                skipBtn.style.opacity = "1";
+                skipBtn.style.cursor = "pointer";
+            }
+        }
+
+        // إنهاء اللعبة وعرض شهادة التقدير وعبارات الثناء
+        function endGame(reason = 'normal') {
+            stopTimer();
+            playSound('win');
+            document.getElementById("game-view").style.display = "none";
+            document.getElementById("summary-view").style.display = "none";
+            document.getElementById("end-view").style.display = "block";
+
+            document.getElementById("final-score-val").innerText = `${score} نقطة`;
+
+            let evalText = "";
+            if (reason === 'timeout') {
+                evalText = "⏰ انتهى الوقت المخصص للتحدي! أداء رائع ومحاولة ممتازة تدل على شجاعتك وسرعتك في التفكير.";
+            } else if (reason === 'lives') {
+                evalText = "❤️ لقد استنفدت محاولاتك! أداء بطولي ومثابرة رائعة، راجع التلخيص لتعود أقوى.";
+            }
+
+            // إضافة عبارات الثناء بحسب مجموع النقاط
+            if (score >= 120) {
+                evalText += (evalText ? "<br>" : "") + "🌟 ما شاء الله تبارك الله! عبقري متوج في الكيمياء وأستاذ قادم، مستوى استثنائي يشرف معلمك!";
+                confetti({ particleCount: 150, spread: 100 });
+            } else if (score >= 70) {
+                evalText += (evalText ? "<br>" : "") + "👏 بطل متميز وذكي جداً! أوشكت على الدرجة الكاملة، جهد يستحق التقدير والإعجاب.";
+            } else {
+                evalText += (evalText ? "<br>" : "") + "💪 عاش يا بطل! بداية واعدة ومجهود مقدّر جداً، راجع كراسة التلخيص وستحقق أعلى الدرجات بإذن الله.";
+            }
+
+            document.getElementById("evaluation-text").innerHTML = evalText;
+        }
+
+        function downloadResultImage() {
+            const card = document.getElementById("export-card");
+            html2canvas(card, { scale: 2.5 }).then(canvas => {
+                const link = document.createElement("a");
+                link.download = `نتيجة_الكيمياء_${score}_نقطة.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+
+        function shareWhatsApp() {
+            const text = `حققتُ ${score} نقطة في تحدي الكيمياء للوحدة الأولى (التفاعلات الكيميائية والاحتراق)! ⚗️\nتحت إشراف الأستاذ: عبد الرحمن عبد الله (01021779644).\nهل تستطيع كسر هذا الرقم في نفس الوقت المحدد؟`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function shareFacebook() {
+            const text = `أنهيتُ بنجاح مسابقة مراجعة العلوم والكيمياء (الوحدة الأولى: التفاعلات الكيميائية والاحتراق) وحققتُ ${score} نقطة في الوقت المحدد! 🚀\nتصميم وإعداد الأستاذ: عبد الرحمن عبد الله - 01021779644`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("تم نسخ نص النتيجة بنجاح! يمكنك الآن لصقها في بوست على فيسبوك.");
+            });
+        }
+
+        function restartGame() {
+            stopTimer();
+            score = 0;
+            lives = 5; // إعادة ضبط القلوب على 5
+            skips = 3;
+            isPaused = false;
+            document.getElementById("end-view").style.display = "none";
+            document.getElementById("summary-view").style.display = "none";
+            document.getElementById("game-view").style.display = "block";
+            selectCategory("المفاهيم والنظريات");
+        }
+
+        // التشغيل المباشر للعبة
+        window.onload = () => {
+            setTheme('dark');
+            selectCategory("المفاهيم والنظريات");
+            document.body.addEventListener('click', () => getAudioContext(), { once: true });
+        };
+    </script>
+</body>
+</html>
